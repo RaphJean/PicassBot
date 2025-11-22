@@ -103,3 +103,32 @@ L'idée centrale est d'utiliser JEPA comme un **World Model** (Modèle du Monde)
 *   **Framework DL** : PyTorch (implémentations JEPA existantes souvent en PyTorch).
 *   **Modèles** : `transformers` (Hugging Face) pour V-JEPA 2.
 *   **Données** : `ndjson` library, `numpy`, `cairo` ou `opencv` pour le rendu des vecteurs.
+
+---
+
+## 6. Implémentation Élémentaire du Monde du Dessin
+
+Pour simplifier le problème et le rendre compatible avec une architecture World Model, nous définissons le "Monde" comme suit :
+
+### 6.1 L'État (State) : La Matrice de Dessin
+*   **Représentation** : Une matrice 2D (Image Raster) représentant la feuille de papier.
+*   **Format** : Grayscale (1 canal), valeurs de 0 (blanc) à 1 (noir).
+*   **Taille** : Fixe, par exemple `64x64` ou `128x128` pixels pour commencer.
+*   **Pourquoi ?** C'est ce que "voit" l'encodeur V-JEPA. C'est la vérité terrain de l'état du monde.
+
+### 6.2 L'Action : Le Trait Vectoriel
+*   **Représentation** : Un vecteur représentant un segment de trait ou une courbe de Bézier simple.
+*   **Format Élémentaire** : `(x_start, y_start, x_end, y_end, width, pressure)`
+    *   Coordonnées normalisées entre 0 et 1.
+    *   Alternative (si on garde en mémoire la position du stylo) : `(dx, dy, pen_down)`.
+*   **Choix pour le projet** : Pour un World Model robuste, l'action **absolue** `(x1, y1, x2, y2)` est souvent plus simple à apprendre car elle ne dépend pas d'une variable cachée "position du stylo".
+
+### 6.3 La Transition : Le Moteur de Rendu
+*   **Fonction** : `NextState = Apply(CurrentState, Action)`
+*   **Implémentation** : C'est un moteur de rendu déterministe (Rasterizer).
+    *   On prend la matrice `CurrentState`.
+    *   On dessine le trait défini par `Action` dessus (ex: avec `cv2.line` ou `PIL.ImageDraw`).
+    *   On obtient `NextState`.
+*   **Rôle dans le JEPA** :
+    *   Le **Prédicteur** doit apprendre à *approximer* cette fonction de transition, mais dans l'**espace latent**.
+    *   Au lieu de prédire les pixels de `NextState`, il prédit l'embedding de `NextState`.
