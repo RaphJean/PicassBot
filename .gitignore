@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env
+
+# Project Data
+data/
+output_demo/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
