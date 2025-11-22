@@ -13,13 +13,20 @@ def main():
     state = world.reset()
     world.render().save(os.path.join(output_dir, "step_0_blank.png"))
     
-    # Define some actions (normalized coordinates)
-    # Drawing a shape with curves
+    # Define some actions (dx, dy, eos, eod)
+    # Drawing a square: Start at (0.2, 0.2)
+    # 1. Move to start (pen up)
+    # 2. Draw right
+    # 3. Draw down
+    # 4. Draw left
+    # 5. Draw up
     actions = [
-        (0.2, 0.5, 0.8, 0.5, 0.2),  # Curve up
-        (0.8, 0.5, 0.2, 0.5, 0.2),  # Curve down (relative to direction, so this might overlap or flip depending on normal)
-        (0.2, 0.2, 0.8, 0.2, -0.5), # Deep curve up
-        (0.5, 0.5, 0.5, 0.9, 0.0),  # Straight line
+        (0.2, 0.2, 1, 0),   # Move to (0.2, 0.2) - Pen Up
+        (0.6, 0.0, 0, 0),   # Draw to (0.8, 0.2) - Pen Down
+        (0.0, 0.6, 0, 0),   # Draw to (0.8, 0.8) - Pen Down
+        (-0.6, 0.0, 0, 0),  # Draw to (0.2, 0.8) - Pen Down
+        (0.0, -0.6, 0, 0),  # Draw to (0.2, 0.2) - Pen Down
+        (0.0, 0.0, 1, 1),   # End drawing
     ]
     
     print(f"Executing {len(actions)} actions...")

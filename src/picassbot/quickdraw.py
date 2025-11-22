@@ -65,8 +65,9 @@ class QuickDrawDataset:
             y_points = stroke[1]
             
             # Normalize coordinates to image size (Quick Draw is usually 255x255)
-            # But we assume input is already in 0-255 range roughly.
-            # If we want to be robust, we could normalize based on min/max of the drawing.
+            scale = image_size / 256.0
+            x_points = [x * scale for x in stroke[0]]
+            y_points = [y * scale for y in stroke[1]]
             
             points = list(zip(x_points, y_points))
             if len(points) > 1:
@@ -90,6 +91,9 @@ class QuickDrawDataset:
         for stroke in strokes:
             x_points = stroke[0]
             y_points = stroke[1]
+            scale = image_size / 256.0
+            x_points = [x * scale for x in stroke[0]]
+            y_points = [y * scale for y in stroke[1]]
             points = list(zip(x_points, y_points))
             
             if len(points) > 1:

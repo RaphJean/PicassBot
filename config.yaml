@@ -1,0 +1,52 @@
+# Policy Network Training Configuration
+
+# Data
+data:
+  data_dir: "data/raw"
+  # Use specific categories or set to "all" or [-1] to use all 345 categories
+  categories: ["cat", "apple", "tree"]
+  # categories: "all"  # Uncomment to use all categories
+  max_drawings_per_category: 1000
+  image_size: 128
+  line_width: 2
+
+# Model Architecture
+model:
+  canvas_channels: 1
+  target_channels: 1
+  hidden_dim: 128
+  action_dim: 4  # dx, dy, eos, eod
+
+# Training
+training:
+  batch_size: 32
+  num_epochs: 10
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  
+  # Loss weights
+  continuous_weight: 1.0
+  discrete_weight: 1.0
+  
+  # Device
+  device: "auto"  # auto, cuda, mps, cpu
+  
+  # Checkpointing
+  checkpoint_dir: "policy_checkpoints"
+  save_every: 1  # Save every N epochs
+  
+  # Logging
+  log_dir: "logs/policy"
+  log_every: 10  # Log every N batches
+
+# Evaluation
+eval:
+  eval_every: 1  # Evaluate every N epochs
+  num_eval_samples: 100
+
+# Latent Predictor (LSTM/GRU for dynamics)
+predictor:
+  type: "lstm"  # lstm or gru
+  hidden_dim: 512
+  num_layers: 2
+

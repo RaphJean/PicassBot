@@ -8,6 +8,18 @@ __pycache__/
 # Project Data
 data/
 output_demo/
+output_dataset_demo/
+output_engine_demo/
+research_output/
+image_mosaique/
+
+# Training Artifacts
+logs/
+policy_checkpoints/
+predictor_checkpoints/
+joint_checkpoints/
+*.pth
+*.tmp
 
 # IDE
 .vscode/

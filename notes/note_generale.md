@@ -116,19 +116,19 @@ Pour simplifier le problème et le rendre compatible avec une architecture World
 *   **Taille** : Fixe, par exemple `64x64` ou `128x128` pixels pour commencer.
 *   **Pourquoi ?** C'est ce que "voit" l'encodeur V-JEPA. C'est la vérité terrain de l'état du monde.
 
-### 6.2 L'Action : Le Trait Vectoriel
-*   **Représentation** : Un vecteur représentant un segment de trait ou une courbe de Bézier simple.
-*   **Format Élémentaire** : `(x_start, y_start, x_end, y_end, width, pressure)`
-    *   Coordonnées normalisées entre 0 et 1.
-    *   Alternative (si on garde en mémoire la position du stylo) : `(dx, dy, pen_down)`.
-*   **Choix pour le projet** : Pour un World Model robuste, l'action **absolue** `(x1, y1, x2, y2)` est souvent plus simple à apprendre car elle ne dépend pas d'une variable cachée "position du stylo".
+### 6.2 L'Action : Le Trait Relatif (Stroke-5 format like)
+*   **Représentation** : Un déplacement relatif du stylo avec des indicateurs d'état.
+*   **Format** : `(dx, dy, p_eos, p_eod)`
+    *   `dx`, `dy` : Déplacement relatif par rapport à la position précédente.
+    *   `p_eos` (End of Stroke) : 1 si le stylo se lève (fin du trait), 0 sinon.
+    *   `p_eod` (End of Drawing) : 1 si le dessin est terminé, 0 sinon.
+*   **Conséquence** : Le "Monde" doit maintenant maintenir un **État Caché** : la position actuelle du stylo `(pen_x, pen_y)`.
 
 ### 6.3 La Transition : Le Moteur de Rendu
-*   **Fonction** : `NextState = Apply(CurrentState, Action)`
-*   **Implémentation** : C'est un moteur de rendu déterministe (Rasterizer).
-    *   On prend la matrice `CurrentState`.
-    *   On dessine le trait défini par `Action` dessus (ex: avec `cv2.line` ou `PIL.ImageDraw`).
-    *   On obtient `NextState`.
-*   **Rôle dans le JEPA** :
-    *   Le **Prédicteur** doit apprendre à *approximer* cette fonction de transition, mais dans l'**espace latent**.
-    *   Au lieu de prédire les pixels de `NextState`, il prédit l'embedding de `NextState`.
+*   **Fonction** : `NextState, NextPenPos = Apply(CurrentState, CurrentPenPos, Action)`
+*   **Implémentation** :
+    1.  Calculer la nouvelle position : `new_x = pen_x + dx`, `new_y = pen_y + dy`.
+    2.  Si `p_eos == 0` : Tracer une ligne (ou courbe) entre `(pen_x, pen_y)` et `(new_x, new_y)` sur le canvas `CurrentState`.
+    3.  Si `p_eos == 1` : Ne rien tracer (déplacement du stylo en l'air), mais mettre à jour la position du stylo.
+    4.  Mettre à jour `pen_x, pen_y` vers `new_x, new_y`.
+*   **Rôle dans le JEPA** : Le Prédicteur devra apprendre cette dynamique relative, ce qui est souvent plus généralisable (le concept de "cercle" est le même peu importe où on le dessine).
