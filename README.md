@@ -23,10 +23,10 @@ pip install -r requirements.txt
 ### Entraînement (Local)
 ```bash
 # Entraînement Joint (Recommandé)
-python -m policy.train_joint --config config.yaml
+python -m picassbot.policy.train_joint --config config.yaml
 
 # Entraînement JEPA (Self-Supervised)
-python -m policy.train_jepa --config config.yaml
+python -m picassbot.policy.train_jepa --config config.yaml
 ```
 
 ### Entraînement (Gratuit sur GPU)
@@ -35,5 +35,5 @@ Cliquez sur le badge "Open in Colab" ci-dessus pour lancer l'entraînement gratu
 ### Inférence / Démo
 ```bash
 # Dessiner un carré avec Latent MPC
-python -m research.run_experiments --strategy latent_mpc --target_type square --joint_model_path joint_checkpoints/last.pth
+python -m picassbot.planning.run_experiments --strategy latent_mpc --target_type square --joint_model_path joint_checkpoints/last.pth
 ```

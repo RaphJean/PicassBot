@@ -1,0 +1,1 @@
+python -m picassbot.planning.run_experiments --strategy latent_mpc --target_type circle --joint_model_path policy_checkpoints/full_agent_epoch_3.pth --no_early_stopping

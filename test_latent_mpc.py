@@ -9,7 +9,7 @@ from PIL import Image
 import os
 import argparse
 
-from research.latent_mpc import LatentMPC, load_latent_mpc_components
+from picassbot.planning.latent_mpc import LatentMPC
 
 def create_simple_target(width=128, height=128):
     """Create a simple square target."""
@@ -21,31 +21,11 @@ def create_simple_target(width=128, height=128):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--policy_path", type=str, required=True, help="Path to policy checkpoint")
-    parser.add_argument("--predictor_path", type=str, required=True, help="Path to predictor checkpoint")
+    parser.add_argument("--joint_model_path", type=str, required=True, help="Path to joint FullAgent checkpoint")
     parser.add_argument("--max_steps", type=int, default=30)
     parser.add_argument("--horizon", type=int, default=5)
     parser.add_argument("--num_sequences", type=int, default=20)
     args = parser.parse_args()
-    
-    # Device
-    if torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("Using MPS")
-    elif torch.cuda.is_available():
-        device = torch.device("cuda")
-        print("Using CUDA")
-    else:
-        device = torch.device("cpu")
-        print("Using CPU")
-    
-    # Load components
-    print("Loading models...")
-    encoder, predictor, policy_heads, target_encoder = load_latent_mpc_components(
-        args.policy_path,
-        args.predictor_path,
-        device
-    )
     
     # Create target
     target = create_simple_target()
@@ -54,14 +34,11 @@ def main():
     world_config = {"width": 128, "height": 128, "line_width": 2}
     
     # Create Latent MPC
+    print(f"Loading Latent MPC from {args.joint_model_path}...")
     latent_mpc = LatentMPC(
         world_config=world_config,
         target_image=target,
-        encoder=encoder,
-        predictor=predictor,
-        policy_heads=policy_heads,
-        target_encoder=target_encoder,
-        device=device,
+        joint_model_path=args.joint_model_path,
         step_penalty=0.00001
     )
     
@@ -73,7 +50,7 @@ def main():
     )
     
     # Save results
-    output_dir = "research_output/latent_mpc"
+    output_dir = "planning_output/latent_mpc"
     os.makedirs(output_dir, exist_ok=True)
     
     # Save target

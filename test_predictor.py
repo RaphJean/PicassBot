@@ -4,7 +4,7 @@ Verifies that the model can be instantiated and performs a forward pass.
 """
 
 import torch
-from policy.predictor import LatentPredictor, LatentPredictorGRU
+from picassbot.policy.predictor import LatentPredictor, LatentPredictorGRU
 
 def test_predictor():
     print("Testing LatentPredictor...")

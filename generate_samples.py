@@ -18,7 +18,7 @@ def main():
         for idx in indices:
             print(f"\n--- Processing {category} (Index {idx}) ---")
             cmd = [
-                "uv", "run", "python", "-m", "research.run_experiments",
+                "uv", "run", "python", "-m", "picassbot.planning.run_experiments",
                 "--strategy", strategy,
                 "--model_path", model_path,
                 "--target_type", "dataset",
